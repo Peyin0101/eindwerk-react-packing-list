@@ -17,8 +17,27 @@ export default function PackingList() {
     return acc;
   }, {});
 
+  const totalItems = state.items.length;
+  const packedItems = state.items.filter((item) => item.packed).length;
+  const percentage =
+    totalItems === 0 ? 0 : Math.round((packedItems / totalItems) * 100);
+
   return (
     <div className="space-y-6">
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-sm text-gray-700">Ingepakt: {percentage}%</span>
+          <span className="text-sm text-gray-700">
+            {packedItems} / {totalItems} items
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-3">
+          <div
+            className="bg-green-500 h-3 rounded-full transition-all duration-300"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      </div>
       {Object.keys(groupedItems).map((category) => (
         <div key={category}>
           <h2 className="font-semibold text-xl mb-2 text-blue-600">
@@ -48,9 +67,14 @@ export default function PackingList() {
                         Pack
                       </button>
                       <button
-                        onClick={() =>
-                          dispatch({ type: "REMOVE_ITEM", payload: item.id })
-                        }
+                        onClick={() => {
+                          const confirmDelete = window.confirm(
+                            `Weet je zeker dat je "${item.text}" wil verwijderen?`
+                          );
+                          if (confirmDelete) {
+                            dispatch({ type: "REMOVE_ITEM", payload: item.id });
+                          }
+                        }}
                         className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
                       >
                         Verwijder
