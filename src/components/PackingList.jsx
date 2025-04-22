@@ -26,14 +26,22 @@ export default function PackingList() {
     <div className="space-y-6">
       <div className="mb-4">
         <div className="flex justify-between items-center mb-1">
-          <span className="text-sm text-gray-700">Ingepakt: {percentage}%</span>
+          <span
+            className={`text-sm font-semibold ${
+              percentage === 100 ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            Ingepakt: {percentage}%
+          </span>
           <span className="text-sm text-gray-700">
             {packedItems} / {totalItems} items
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-3">
           <div
-            className="bg-green-500 h-3 rounded-full transition-all duration-300"
+            className={`h-3 rounded-full transition-all duration-300 ${
+              percentage === 100 ? "bg-green-500" : "bg-red-500"
+            }`}
             style={{ width: `${percentage}%` }}
           />
         </div>
