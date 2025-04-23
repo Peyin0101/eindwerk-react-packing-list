@@ -5,6 +5,11 @@ export default function PackingList() {
   const { state, dispatch } = usePacking();
   const selectedFilters = state.selectedFilters;
 
+  const hasSavedItems =
+    typeof localStorage !== "undefined" &&
+    localStorage.getItem("packing-items") &&
+    JSON.parse(localStorage.getItem("packing-items")).length > 0;
+
   const filteredItems =
     selectedFilters.length === 0 || selectedFilters.includes("Alle")
       ? state.items
@@ -126,9 +131,17 @@ export default function PackingList() {
                           Unpack
                         </button>
                         <button
-                          onClick={() =>
-                            dispatch({ type: "REMOVE_ITEM", payload: item.id })
-                          }
+                          onClick={() => {
+                            const confirmDelete = window.confirm(
+                              `Weet je zeker dat je "${item.text}" wil verwijderen?`
+                            );
+                            if (confirmDelete) {
+                              dispatch({
+                                type: "REMOVE_ITEM",
+                                payload: item.id,
+                              });
+                            }
+                          }}
                           className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
                         >
                           Verwijder
@@ -140,6 +153,27 @@ export default function PackingList() {
             </div>
           </div>
         ))}
+      <div className="flex justify-end mt-6">
+        <button
+          onClick={() => {
+            const confirmReset = window.confirm(
+              "Weet je zeker dat je de volledige lijst wil wissen?"
+            );
+            if (confirmReset) {
+              localStorage.removeItem("packing-items");
+              window.location.reload();
+            }
+          }}
+          disabled={!hasSavedItems}
+          className={`px-4 py-2 rounded shadow transition text-white ${
+            hasSavedItems
+              ? "bg-gray-600 hover:bg-gray-700 cursor-pointer"
+              : "bg-gray-300 cursor-not-allowed"
+          }`}
+        >
+          Reset lijst
+        </button>
+      </div>
     </div>
   );
 }

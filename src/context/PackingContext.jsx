@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 
 const PackingContext = createContext();
 
@@ -10,23 +10,21 @@ const initialState = {
 function reducer(state, action) {
   switch (action.type) {
     case "ADD_ITEM":
-      const updatedItems = [...state.items, action.payload];
-      localStorage.setItem("packing-items", JSON.stringify(updatedItems));
-      return { ...state, items: updatedItems };
+      return { ...state, items: [...state.items, action.payload] };
 
     case "REMOVE_ITEM":
-      const remaining = state.items.filter(
-        (item) => item.id !== action.payload
-      );
-      localStorage.setItem("packing-items", JSON.stringify(remaining));
-      return { ...state, items: remaining };
+      return {
+        ...state,
+        items: state.items.filter((item) => item.id !== action.payload),
+      };
 
     case "TOGGLE_PACKED":
-      const toggled = state.items.map((item) =>
-        item.id === action.payload ? { ...item, packed: !item.packed } : item
-      );
-      localStorage.setItem("packing-items", JSON.stringify(toggled));
-      return { ...state, items: toggled };
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item.id === action.payload ? { ...item, packed: !item.packed } : item
+        ),
+      };
 
     case "ADD_FILTER":
       if (!state.selectedFilters.includes(action.payload)) {
@@ -55,6 +53,9 @@ function reducer(state, action) {
 
 export function PackingProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  useEffect(() => {
+    localStorage.setItem("packing-items", JSON.stringify(state.items));
+  }, [state.items]);
   return (
     <PackingContext.Provider value={{ state, dispatch }}>
       {children}
